@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GrindHolm</title>
+    <link rel="stylesheet" href="./ui/styles.css" />
+  </head>
+  <body>
+    <div id="game-root">
+      <div id="pixi-container"></div>
+      <div id="hud-root">
+        <div id="hud-status" class="hud-strip">
+          <span id="hud-fps">— fps</span>
+          <span id="hud-context">ctx: —</span>
+          <span id="hud-coords">— , —</span>
+          <span id="hud-help">F1 paint · F2 hub · ESC back</span>
+        </div>
+      </div>
+      <div id="dev-overlay" class="hidden"></div>
+      <div id="modal-hub" class="hidden"></div>
+      <div id="boot-error" class="hidden"></div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

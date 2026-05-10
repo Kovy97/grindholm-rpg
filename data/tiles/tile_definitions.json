@@ -1,0 +1,66 @@
+[
+  {
+    "id": "grass_basic",
+    "name": "Grass",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#3a7d2c",
+    "tags": ["natural", "ground"]
+  },
+  {
+    "id": "grass_dark",
+    "name": "Dark Grass",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#2c5e1f",
+    "tags": ["natural", "ground"]
+  },
+  {
+    "id": "stone_path",
+    "name": "Stone Path",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#8a8478",
+    "tags": ["constructed", "ground"]
+  },
+  {
+    "id": "sand",
+    "name": "Sand",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#d4be7e",
+    "tags": ["natural", "ground"]
+  },
+  {
+    "id": "water",
+    "name": "Water",
+    "layer": "ground",
+    "walkable": false,
+    "color": "#3868a8",
+    "tags": ["natural", "liquid"]
+  },
+  {
+    "id": "tree_oak",
+    "name": "Oak Tree",
+    "layer": "objects",
+    "walkable": false,
+    "color": "#4a2f1a",
+    "tags": ["natural", "tree"]
+  },
+  {
+    "id": "bush",
+    "name": "Bush",
+    "layer": "objects",
+    "walkable": false,
+    "color": "#1f4d18",
+    "tags": ["natural", "shrub"]
+  },
+  {
+    "id": "wall_stone",
+    "name": "Stone Wall",
+    "layer": "collision",
+    "walkable": false,
+    "color": "#5a5550",
+    "tags": ["constructed", "wall"]
+  }
+]

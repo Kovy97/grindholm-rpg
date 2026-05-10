@@ -1,0 +1,68 @@
+[
+  {
+    "action": "MOVE_UP",
+    "contexts": ["game"],
+    "keys": [{"key": "KeyW"}, {"key": "ArrowUp"}],
+    "gamepad": [{"input": "stick_left_up"}, {"input": "dpad_up"}]
+  },
+  {
+    "action": "MOVE_DOWN",
+    "contexts": ["game"],
+    "keys": [{"key": "KeyS"}, {"key": "ArrowDown"}],
+    "gamepad": [{"input": "stick_left_down"}, {"input": "dpad_down"}]
+  },
+  {
+    "action": "MOVE_LEFT",
+    "contexts": ["game"],
+    "keys": [{"key": "KeyA"}, {"key": "ArrowLeft"}],
+    "gamepad": [{"input": "stick_left_left"}, {"input": "dpad_left"}]
+  },
+  {
+    "action": "MOVE_RIGHT",
+    "contexts": ["game"],
+    "keys": [{"key": "KeyD"}, {"key": "ArrowRight"}],
+    "gamepad": [{"input": "stick_left_right"}, {"input": "dpad_right"}]
+  },
+  {
+    "action": "INTERACT",
+    "contexts": ["game", "dialog"],
+    "keys": [{"key": "KeyE"}, {"key": "Space"}],
+    "gamepad": [{"input": "button_a"}]
+  },
+  {
+    "action": "CANCEL",
+    "contexts": ["modal", "dev_overlay", "dialog"],
+    "keys": [{"key": "Escape"}],
+    "gamepad": [{"input": "button_b"}]
+  },
+  {
+    "action": "OPEN_INVENTORY",
+    "contexts": ["game"],
+    "keys": [{"key": "Tab"}, {"key": "KeyI"}],
+    "gamepad": [{"input": "button_y"}]
+  },
+  {
+    "action": "TOGGLE_DEV_OVERLAY",
+    "contexts": ["game", "dev_overlay"],
+    "keys": [{"key": "F1"}],
+    "gamepad": []
+  },
+  {
+    "action": "TOGGLE_MODAL_HUB",
+    "contexts": ["game", "modal"],
+    "keys": [{"key": "F2"}],
+    "gamepad": []
+  },
+  {
+    "action": "PAINT_PRIMARY",
+    "contexts": ["dev_overlay"],
+    "keys": [{"mouse_button": 0}],
+    "gamepad": [{"input": "button_a"}]
+  },
+  {
+    "action": "PAINT_SECONDARY",
+    "contexts": ["dev_overlay"],
+    "keys": [{"mouse_button": 2}],
+    "gamepad": [{"input": "button_x"}]
+  }
+]
