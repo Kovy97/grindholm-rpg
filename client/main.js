@@ -17,6 +17,7 @@ import { TabBar } from "./ui/TabBar.js";
 import { Minimap } from "./ui/Minimap.js";
 import { Toast } from "./ui/Toast.js";
 import { showContextMenu, hideContextMenu } from "./ui/ContextMenu.js";
+import { TradeModal } from "./ui/TradeModal.js";
 import { Action } from "./input/actions.js";
 
 async function boot() {
