@@ -102,23 +102,35 @@ async function boot() {
       root: document.getElementById("modal-hub"),
       bus,
       contextStack: stack,
+      gameClient: gc,
       onOpen: () => (isModalOpen = true),
       onClose: () => (isModalOpen = false),
     });
 
-    // game UI panels
+    const tradeModal = new TradeModal({
+      root: document.getElementById("trade-modal"),
+      gameClient: gc,
+    });
+
+    // game UI panels — each owns its own slot div so they don't clobber each other
     const panelHost = document.getElementById("hud-panel-host");
     const inventoryPanel = new InventoryPanel({
-      root: panelHost,
+      root: document.getElementById("panel-inventory"),
       gameClient: gc,
       onContextMenu: (actions, x, y) => showContextMenu(actions, x, y),
     });
-    const equipmentPanel = new EquipmentPanel({ root: panelHost, gameClient: gc });
-    const skillsPanel = new SkillsPanel({ root: panelHost, gameClient: gc });
+    const equipmentPanel = new EquipmentPanel({
+      root: document.getElementById("panel-equipment"),
+      gameClient: gc,
+    });
+    const skillsPanel = new SkillsPanel({
+      root: document.getElementById("panel-skills"),
+      gameClient: gc,
+    });
 
     let buildSelection = null;
     const buildPanel = new BuildPanel({
-      root: panelHost,
+      root: document.getElementById("panel-build"),
       gameClient: gc,
       onPickBuilding: (def) => {
         buildSelection = def;

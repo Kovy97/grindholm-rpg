@@ -51,6 +51,7 @@ export class ModalHub {
     for (const btn of this._root.querySelectorAll("button[data-tab]")) {
       btn.addEventListener("click", () => this._setTab(btn.dataset.tab));
     }
+    if (this._currentTab === "spawn") this._wireSpawnTab();
   }
 
   _setTab(id) {
@@ -140,6 +141,11 @@ export class ModalHub {
     this._active = true;
     this._stack.push(Context.MODAL);
     this._root.classList.remove("hidden");
+    // Re-render the current tab so the archetype list reflects any new
+    // game state (e.g. after recruitment), and (re)wire click handlers.
+    const body = this._root.querySelector("#modal-body");
+    if (body) body.innerHTML = this._renderTab(this._currentTab);
+    if (this._currentTab === "spawn") this._wireSpawnTab();
     this._onOpen();
   }
 
