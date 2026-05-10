@@ -5,7 +5,7 @@
     "layer": "ground",
     "walkable": true,
     "color": "#3a7d2c",
-    "sprite": "tiles/grass_basic.png",
+    "sprite": "tiles/grass_tall.png",
     "tags": ["natural", "ground"]
   },
   {
@@ -14,7 +14,7 @@
     "layer": "ground",
     "walkable": true,
     "color": "#3d6b1f",
-    "sprite": "tiles/grass_patchy.png",
+    "sprite": "tiles/grass_tall.png",
     "tags": ["natural", "ground"]
   },
   {
@@ -32,7 +32,7 @@
     "layer": "ground",
     "walkable": true,
     "color": "#cdd6cf",
-    "sprite": "tiles/grass_snowy.png",
+    "sprite": "tiles/grass_tall.png",
     "tags": ["natural", "ground", "winter"]
   },
   {
