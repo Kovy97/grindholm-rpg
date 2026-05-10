@@ -1,0 +1,91 @@
+[
+  {
+    "id": "campfire",
+    "name": "Campfire",
+    "category": "utility",
+    "color": "#cc4422",
+    "width_tiles": 1,
+    "height_tiles": 1,
+    "sprite_height_tiles": 1.0,
+    "walkable": false,
+    "skill_level_required": 1,
+    "construction_cost": [{"item_id": "log_normal", "count": 3}],
+    "provides_station": "fire",
+    "xp_on_build": 25
+  },
+  {
+    "id": "bed_simple",
+    "name": "Simple Bed",
+    "category": "furniture",
+    "color": "#a07050",
+    "width_tiles": 2,
+    "height_tiles": 1,
+    "sprite_height_tiles": 0.7,
+    "walkable": false,
+    "skill_level_required": 5,
+    "construction_cost": [
+      {"item_id": "log_normal", "count": 4},
+      {"item_id": "plank_normal", "count": 2}
+    ],
+    "is_bed": true,
+    "xp_on_build": 60
+  },
+  {
+    "id": "chest_storage",
+    "name": "Storage Chest",
+    "category": "furniture",
+    "color": "#704028",
+    "width_tiles": 1,
+    "height_tiles": 1,
+    "sprite_height_tiles": 1.0,
+    "walkable": false,
+    "skill_level_required": 3,
+    "construction_cost": [{"item_id": "plank_normal", "count": 4}],
+    "xp_on_build": 35
+  },
+  {
+    "id": "wall_log",
+    "name": "Log Wall",
+    "category": "structure",
+    "color": "#5a3520",
+    "width_tiles": 1,
+    "height_tiles": 1,
+    "sprite_height_tiles": 1.5,
+    "walkable": false,
+    "blocks_line_of_sight": true,
+    "skill_level_required": 8,
+    "construction_cost": [{"item_id": "log_normal", "count": 2}],
+    "xp_on_build": 30
+  },
+  {
+    "id": "workbench",
+    "name": "Workbench",
+    "category": "production",
+    "color": "#806040",
+    "width_tiles": 2,
+    "height_tiles": 1,
+    "sprite_height_tiles": 1.0,
+    "walkable": false,
+    "skill_level_required": 10,
+    "construction_cost": [{"item_id": "plank_normal", "count": 6}],
+    "provides_station": "workbench",
+    "xp_on_build": 80
+  },
+  {
+    "id": "town_hall",
+    "name": "Town Hall",
+    "category": "town",
+    "color": "#9a7848",
+    "width_tiles": 3,
+    "height_tiles": 3,
+    "sprite_height_tiles": 3.0,
+    "walkable": false,
+    "skill_level_required": 1,
+    "construction_cost": [
+      {"item_id": "log_normal", "count": 30},
+      {"item_id": "plank_normal", "count": 20}
+    ],
+    "provides_station": "town_hall",
+    "xp_on_build": 500
+  }
+]

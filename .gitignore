@@ -38,5 +38,6 @@ assets/_*/
 build/
 *.spec
 
-# Claude
-.claude/
+# Claude — keep agent personas in repo, ignore session-local data
+.claude/*
+!.claude/agents/

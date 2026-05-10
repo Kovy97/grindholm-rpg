@@ -271,3 +271,299 @@ body {
   white-space: pre-wrap;
   z-index: 999;
 }
+
+/* ================================================================ */
+/* GAME HUD (2.0)                                                   */
+/* ================================================================ */
+
+#hud-game {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+#hud-game > * { pointer-events: auto; }
+
+/* Minimap top-right */
+#minimap-host {
+  position: absolute;
+  top: 30px;
+  right: 12px;
+  width: 192px;
+  height: 192px;
+  border: 2px solid #5c4a2a;
+  background: #0a0a0a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  border-radius: 4px;
+  overflow: hidden;
+}
+#minimap-host canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* Active panel pinned above tabbar */
+#hud-panel-host {
+  position: absolute;
+  bottom: 56px;
+  right: 12px;
+  width: 260px;
+  background: #2c2419;
+  border: 2px solid #5c4a2a;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: ui-monospace, "Cascadia Mono", monospace;
+  font-size: 12px;
+  color: #e8e2d0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+}
+
+#hud-panel-host.hidden { display: none !important; }
+
+/* Inventory grid */
+.inv-panel-title, .eq-panel-title, .sk-panel-title, .bld-panel-title {
+  text-align: center;
+  font-size: 13px;
+  color: #d4b870;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 44px);
+  grid-template-rows: repeat(6, 44px);
+  gap: 2px;
+  justify-content: center;
+}
+.inv-slot {
+  background: #1a1410;
+  border: 1px solid #4a3920;
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+}
+.inv-slot:hover {
+  outline: 2px solid var(--hud-accent);
+}
+.inv-slot-empty { background: #14100a; }
+.inv-icon {
+  position: absolute;
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+.inv-count {
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  font-size: 10px;
+  color: #ffeb70;
+  text-shadow: 1px 1px 0 #000, -1px 0 #000, 0 1px #000, 1px 0 #000;
+  pointer-events: none;
+  font-family: ui-monospace, monospace;
+}
+.inv-gold {
+  text-align: right;
+  margin-top: 6px;
+  color: #d4b870;
+  font-size: 12px;
+}
+
+/* Equipment grid */
+.eq-grid {
+  display: grid;
+  grid-template-columns: 50px 50px 50px;
+  grid-template-rows: repeat(5, 50px);
+  grid-template-areas:
+    ".      head   ."
+    "cape   amulet ammo"
+    "weapon body   shield"
+    ".      legs   ."
+    "hands  feet   ring";
+  gap: 4px;
+  justify-content: center;
+}
+.eq-slot {
+  background: #1a1410;
+  border: 1px solid #4a3920;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.eq-slot:hover { outline: 2px solid var(--hud-accent); }
+.eq-slot-label {
+  font-size: 9px;
+  color: #6a604a;
+  text-transform: uppercase;
+}
+.eq-slot .inv-icon { top: 6px; left: 6px; right: 6px; bottom: 6px; }
+
+/* Skills grid */
+.sk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.sk-cell {
+  display: grid;
+  grid-template-columns: 24px 1fr 28px;
+  grid-template-rows: 18px 5px;
+  gap: 2px;
+  align-items: center;
+  background: #1a1410;
+  border: 1px solid #4a3920;
+  padding: 4px;
+  border-radius: 2px;
+}
+.sk-icon { width: 22px; height: 22px; border-radius: 2px; grid-row: 1; }
+.sk-name { font-size: 11px; color: #d8d2c0; grid-row: 1; }
+.sk-level {
+  font-size: 13px;
+  color: #ffeb70;
+  font-weight: bold;
+  text-align: right;
+  grid-row: 1;
+}
+.sk-bar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  background: #0a0805;
+  border: 1px solid #2a2010;
+  height: 4px;
+  position: relative;
+}
+.sk-bar-fill {
+  background: #d4b870;
+  height: 100%;
+  transition: width 0.2s;
+}
+.sk-total {
+  text-align: right;
+  margin-top: 6px;
+  color: #d4b870;
+}
+
+/* Build panel */
+.bld-help {
+  font-size: 10px;
+  color: #968a6a;
+  margin-bottom: 8px;
+}
+.bld-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.bld-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #1a1410;
+  border: 1px solid #4a3920;
+  padding: 6px;
+  cursor: pointer;
+  text-align: left;
+  color: #e8e2d0;
+  font-family: inherit;
+}
+.bld-row:hover:not(.disabled) {
+  background: #2a2014;
+  border-color: var(--hud-accent);
+}
+.bld-row.disabled { opacity: 0.4; cursor: not-allowed; }
+.bld-icon { width: 32px; height: 32px; border: 1px solid #000; border-radius: 2px; flex-shrink: 0; }
+.bld-meta { flex: 1; font-size: 11px; }
+.bld-name { color: #d4b870; }
+.bld-cost { color: #968a6a; font-size: 10px; }
+
+/* Tab bar */
+#tab-host {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+.tabbar {
+  display: flex;
+  gap: 2px;
+  background: #2c2419;
+  border: 2px solid #5c4a2a;
+  padding: 3px;
+  border-radius: 4px;
+}
+.tabbar-btn {
+  width: 38px;
+  height: 38px;
+  background: #1a1410;
+  border: 1px solid #4a3920;
+  color: #e8e2d0;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-family: inherit;
+}
+.tabbar-btn:hover { background: #2a2014; }
+.tabbar-btn.active { background: #5c4a2a; border-color: #d4b870; }
+
+/* Context menu */
+.ctx-menu {
+  position: fixed;
+  background: #1a1410;
+  border: 2px solid #5c4a2a;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  z-index: 100;
+  min-width: 140px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+}
+.ctx-row {
+  padding: 6px 12px;
+  color: #d8d2c0;
+  cursor: pointer;
+}
+.ctx-row:hover { background: #5c4a2a; color: #ffeb70; }
+.ctx-default { font-weight: bold; color: #ffeb70; }
+
+/* Toasts (bottom-left) */
+#toast-host {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+.toast-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.toast {
+  background: rgba(20, 16, 10, 0.85);
+  border-left: 3px solid var(--hud-accent);
+  color: #e8e2d0;
+  padding: 4px 10px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  transition: opacity 0.8s;
+  border-radius: 0 3px 3px 0;
+}
+.toast.success { border-left-color: #88c070; }
+.toast.error { border-left-color: var(--danger); }
+.toast.xp { border-left-color: #d4b870; color: #ffeb70; }
+.toast.fade { opacity: 0; }
+
+/* Build placement cursor */
+.build-placement-cursor {
+  position: absolute;
+  display: none;
+  border: 2px dashed #d4b870;
+  background: rgba(212, 184, 112, 0.15);
+  pointer-events: none;
+  z-index: 18;
+}

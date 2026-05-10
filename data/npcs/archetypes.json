@@ -1,0 +1,56 @@
+[
+  {
+    "id": "villager_woodcutter",
+    "name_pool": ["Larry Wood", "Olive Birch", "Brand Elm", "Holly Pine", "Ferdinand Oak"],
+    "archetype": "specialist",
+    "color": "#8a6a4a",
+    "starting_skills": {
+      "woodcutting": [25, 45]
+    },
+    "base_recruitment_cost": 200
+  },
+  {
+    "id": "villager_fisher",
+    "name_pool": ["Marina Reel", "Cole Trout", "Briny Pike", "Wave Lobster"],
+    "archetype": "specialist",
+    "color": "#508090",
+    "starting_skills": {
+      "fishing": [20, 40]
+    },
+    "base_recruitment_cost": 220
+  },
+  {
+    "id": "villager_cook",
+    "name_pool": ["Sage Roux", "Pearl Brine", "Basil Sear"],
+    "archetype": "specialist",
+    "color": "#a06030",
+    "starting_skills": {
+      "cooking": [25, 50]
+    },
+    "base_recruitment_cost": 250
+  },
+  {
+    "id": "villager_farmer",
+    "name_pool": ["Tilly Furrow", "Reed Sprout", "Mira Loam"],
+    "archetype": "specialist",
+    "color": "#6a8030",
+    "starting_skills": {
+      "farming": [20, 40]
+    },
+    "base_recruitment_cost": 200
+  },
+  {
+    "id": "villager_general",
+    "name_pool": ["Wren", "Pip", "Quill", "Mose", "Tilda", "Brom"],
+    "archetype": "villager",
+    "color": "#7a7060",
+    "starting_skills": {
+      "woodcutting": [5, 15],
+      "fishing": [5, 15],
+      "cooking": [5, 15],
+      "farming": [5, 15],
+      "building": [5, 15]
+    },
+    "base_recruitment_cost": 100
+  }
+]

@@ -6,11 +6,24 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from server.api import router as api_router
+from server.game import tick as game_tick
+from server.game.world import grant_starter_inventory, populate_initial_world
+from server.game.state import state as game_state
 from server.paths import ASSETS_DIR, DIST_DIR
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="GrindHolm", version="0.1.0")
+    app = FastAPI(title="GrindHolm", version="0.2.0")
+
+    @app.on_event("startup")
+    def _bootstrap() -> None:
+        populate_initial_world(game_state)
+        grant_starter_inventory(game_state)
+        game_tick.start()
+
+    @app.on_event("shutdown")
+    def _shutdown() -> None:
+        game_tick.stop()
 
     # Allow vite dev server on a different origin during development.
     app.add_middleware(
