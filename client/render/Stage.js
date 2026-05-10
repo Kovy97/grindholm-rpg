@@ -1,7 +1,7 @@
 import { Application, Container, TextureSource } from "pixi.js";
 
 // Mirror of shared/schemas/constants.py::TILE_PIXEL_SIZE. Don't drift.
-export const TILE_SIZE = 96;
+export const TILE_SIZE = 128;
 
 export const ZOOM_MIN = 0.5;
 export const ZOOM_MAX = 3.0;

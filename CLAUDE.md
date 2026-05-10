@@ -26,12 +26,12 @@ Was 1.0 enthalten muss:
 
 ## Render-Architektur (3/4 axis-aligned)
 
-- **Tile-Grid:** rechteckig, **96×96 Pixel pro Tile** (`shared/schemas/constants.py::TILE_PIXEL_SIZE`). Pixel-Density-Stil = mid/high detail pixelart (Octopath Traveler / Sea of Stars Niveau).
+- **Tile-Grid:** rechteckig, **128×128 Pixel pro Tile** (`shared/schemas/constants.py::TILE_PIXEL_SIZE`). Pixel-Density-Stil = high-detail pixelart (Owlboy-tier, deutlich über Stardew/Octopath). Tile-Größe ist gleichzeitig die Welt-Einheit — Avatar-Movement, Y-Sort und Collision rechnen alle in dieser Einheit.
 - **Drei Render-Pässe pro Frame** (`client/render/Stage.js` Layers):
   1. `ground` — flache Bodentiles, ein Graphics-Aufruf für die ganze Map.
   2. `props` — Objects + Collision-Tiles + Avatar, alle als individuelle Container, **Y-sortiert per `zIndex = footPx`**. So überdecken sich höhere Sprites korrekt mit Avatar.
   3. `debug` — Collision-Outlines (rot, optional toggle).
-- **Object-Größe:** `TileDef.width_tiles` und `TileDef.height_tiles` (beide default 1.0). Sprite-Pixelmaße = `TILE_SIZE × width_tiles` breit, `TILE_SIZE × height_tiles` hoch, am Footprint zentriert (bottom-center). Beispiele: Eichenbaum 1.5×2.5 (144×240 px), Steinwand 1.0×1.5 (96×144 px), Bush 1.0×1.0 (96×96 px).
+- **Object-Größe:** `TileDef.width_tiles` und `TileDef.height_tiles` (beide default 1.0). Sprite-Pixelmaße = `TILE_SIZE × width_tiles` breit, `TILE_SIZE × height_tiles` hoch, am Footprint zentriert (bottom-center). Beispiele bei TILE_SIZE=128: Eichenbaum 1.5×2.5 (**192×320 px**), Steinwand 1.0×1.5 (**128×192 px**), Bush 1.0×1.0 (**128×128 px**).
 - **Asset-Format:** PNG mit Alpha, **kein Anti-Aliasing** (Pixi ist global auf `nearest`-Scaling gesetzt), Anker = Bottom-Center jedes Sprite-Boundings.
 - **Sprite-Anker:** Bottom-Center jeder Prop. Y-Sort-Key = `(ty+1) * TILE_SIZE` für Tiles, `wy + 12` für Avatar (Foot-Y).
 - **Procedural-Fallback:** Footprint dunkler + Krone heller + Schatten-Ellipse — deutet 3/4-Höhe ohne echte Sprites an. Wird durch Sprite-Atlas-Calls in `_drawProp` ersetzt sobald Assets verfügbar sind.

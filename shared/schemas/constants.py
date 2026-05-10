@@ -13,10 +13,11 @@ from typing import Final
 # divides source images by it. Don't change without a coordinated asset
 # repackage — every existing sprite would need to be redrawn.
 #
-# Density rationale: 96 = mid/high-detail pixel art. Reference titles
-# Octopath Traveler 2D-HD, Sea of Stars (similar density). Sub-multiples
-# of 32 (16, 32) are kept reserved for UI / item icons.
-TILE_PIXEL_SIZE: Final[int] = 96
+# Density rationale: 128 = high-detail pixel art. Solo-dev decision —
+# the visual ceiling matters more than the per-asset hour budget for this
+# project. Reference titles around this density: Owlboy, late-era 2D HD
+# remasters. Sub-multiples (32, 64) are kept reserved for UI / item icons.
+TILE_PIXEL_SIZE: Final[int] = 128
 
 # Game-loop tick rate. Deterministic logic (later: multiplayer sync) runs
 # at this rate; render frames are decoupled.
