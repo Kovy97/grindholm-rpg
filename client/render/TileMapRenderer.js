@@ -1,26 +1,32 @@
 import { Container, Graphics } from "pixi.js";
 import { TILE_SIZE } from "./Stage.js";
 
-// Renders a TileMap into the Stage's layer containers.
-// 1.0 uses procedural fallback rendering (colored rects from TileDef.color).
-// Replace fillRect() with sprite atlas later, no other changes needed.
+// 3/4-perspective renderer. Three render passes per map:
+//   ground:   one flat Graphics covering the whole ground layer (cheap)
+//   props:    one Container per non-ground tile, anchored at its FOOT and
+//             sorted by zIndex = footPx so taller tiles overlap correctly
+//             with the avatar (which is also in this layer)
+//   debug:    red outlines for collision-layer tiles (toggle)
+//
+// Procedural fallback simulates 3/4 perspective by drawing a darker footprint
+// rect (the "shadow / trunk") at the bottom of the sprite and a lighter
+// crown rect above it. Replace _renderProp with sprite-atlas calls later.
 export class TileMapRenderer {
   constructor({ stage, tileDefs }) {
     this._stage = stage;
     this._defs = new Map(tileDefs.map((t) => [t.id, t]));
-    this._cellsByLayer = new Map();
-    this._gridLines = null;
-    this._dirty = new Set();
     this._map = null;
+    this._propNodes = new Map(); // "tx,ty" -> Container
   }
 
   setMap(map) {
     this._map = map;
     this._clearAll();
+    this._renderGround(map);
     for (const layer of map.layers) {
-      this._renderLayer(layer);
+      if (layer.layer === "ground") continue;
+      this._renderObjectLayer(layer);
     }
-    this._renderGrid(map);
   }
 
   /** Repaint a single tile cell — for live editor use. */
@@ -31,7 +37,15 @@ export class TileMapRenderer {
     const idx = ty * this._map.width + tx;
     if (idx < 0 || idx >= layer.cells.length) return;
     layer.cells[idx] = tileId;
-    this._renderLayer(layer);
+
+    if (layerName === "ground") {
+      // Cheap: re-render the whole ground pass. Fast for grids up to a
+      // few hundred tiles per side.
+      this._renderGround(this._map);
+    } else {
+      // Targeted: replace just this cell's prop node.
+      this._renderPropCell(layerName, tx, ty, tileId);
+    }
   }
 
   get map() {
@@ -51,60 +65,131 @@ export class TileMapRenderer {
     return true;
   }
 
-  _renderLayer(layer) {
-    const container = this._stage.layers[layer.layer];
-    if (!container) return;
+  _renderGround(map) {
+    const container = this._stage.layers.ground;
     container.removeChildren();
     const g = new Graphics();
-    for (let i = 0; i < layer.cells.length; i++) {
-      const id = layer.cells[i];
-      if (!id) continue;
-      const def = this._defs.get(id);
-      if (!def) continue;
-      const tx = i % this._map.width;
-      const ty = Math.floor(i / this._map.width);
-      const x = tx * TILE_SIZE;
-      const y = ty * TILE_SIZE;
-      const color = def.color ?? "#ff00ff";
-      g.rect(x, y, TILE_SIZE, TILE_SIZE).fill({ color });
-      // Subtle outline on objects/collision so they read distinctly
-      if (layer.layer === "objects") {
-        g.rect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2)
-          .stroke({ color: 0x000000, alpha: 0.35, width: 1 });
-      } else if (layer.layer === "collision") {
-        g.rect(x, y, TILE_SIZE, TILE_SIZE)
-          .stroke({ color: 0xff4040, width: 2 });
+    const ground = map.layers.find((l) => l.layer === "ground");
+    if (ground) {
+      for (let i = 0; i < ground.cells.length; i++) {
+        const id = ground.cells[i];
+        if (!id) continue;
+        const def = this._defs.get(id);
+        if (!def) continue;
+        const tx = i % map.width;
+        const ty = Math.floor(i / map.width);
+        g.rect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+          .fill({ color: def.color ?? "#ff00ff" });
       }
+    }
+    // faint gridlines for editor orientation
+    const w = map.width * TILE_SIZE;
+    const h = map.height * TILE_SIZE;
+    for (let x = 0; x <= map.width; x++) {
+      g.moveTo(x * TILE_SIZE, 0).lineTo(x * TILE_SIZE, h)
+        .stroke({ color: 0x000000, alpha: 0.08, width: 1 });
+    }
+    for (let y = 0; y <= map.height; y++) {
+      g.moveTo(0, y * TILE_SIZE).lineTo(w, y * TILE_SIZE)
+        .stroke({ color: 0x000000, alpha: 0.08, width: 1 });
     }
     container.addChild(g);
   }
 
-  _renderGrid(map) {
-    // Faint gridlines on top of ground layer for editor orientation
-    const grid = new Graphics();
-    const w = map.width * TILE_SIZE;
-    const h = map.height * TILE_SIZE;
-    for (let x = 0; x <= map.width; x++) {
-      grid
-        .moveTo(x * TILE_SIZE, 0)
-        .lineTo(x * TILE_SIZE, h)
-        .stroke({ color: 0x000000, alpha: 0.08, width: 1 });
+  _renderObjectLayer(layer) {
+    for (let i = 0; i < layer.cells.length; i++) {
+      const id = layer.cells[i];
+      if (!id) continue;
+      const tx = i % this._map.width;
+      const ty = Math.floor(i / this._map.width);
+      this._renderPropCell(layer.layer, tx, ty, id);
     }
-    for (let y = 0; y <= map.height; y++) {
-      grid
-        .moveTo(0, y * TILE_SIZE)
-        .lineTo(w, y * TILE_SIZE)
-        .stroke({ color: 0x000000, alpha: 0.08, width: 1 });
+  }
+
+  _renderPropCell(layerName, tx, ty, tileId) {
+    const key = `${tx},${ty},${layerName}`;
+    const existing = this._propNodes.get(key);
+    if (existing) {
+      existing.destroy({ children: true });
+      this._propNodes.delete(key);
+      // Also remove the matching debug outline if any
+      const debugKey = `dbg:${key}`;
+      const dbg = this._propNodes.get(debugKey);
+      if (dbg) {
+        dbg.destroy({ children: true });
+        this._propNodes.delete(debugKey);
+      }
     }
-    grid.alpha = 0.6;
-    this._gridLines = grid;
-    this._stage.layers.ground.addChild(grid);
+    if (!tileId) return;
+    const def = this._defs.get(tileId);
+    if (!def) return;
+
+    const heightPx = TILE_SIZE * (def.height_tiles ?? 1.0);
+    const footY = (ty + 1) * TILE_SIZE; // bottom edge of the tile
+    const node = new Container();
+    node.x = tx * TILE_SIZE;
+    node.y = footY;
+    node.zIndex = footY; // Y-sort key
+    this._drawProp(node, def, heightPx);
+    this._stage.layers.props.addChild(node);
+    this._propNodes.set(key, node);
+
+    // Collision-layer tiles also get a debug outline overlay
+    if (layerName === "collision") {
+      const dbg = new Graphics()
+        .rect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        .stroke({ color: 0xff4040, width: 2, alignment: 0 });
+      this._stage.layers.debug.addChild(dbg);
+      this._propNodes.set(`dbg:${key}`, dbg);
+    }
+  }
+
+  /** Procedural 3/4 prop: darker base footprint + lighter crown above. */
+  _drawProp(node, def, heightPx) {
+    const g = new Graphics();
+    const baseColor = def.color ?? "#ff00ff";
+    const crownColor = lighten(baseColor, 0.18);
+    const baseHeight = Math.min(TILE_SIZE, heightPx * 0.45);
+    const crownHeight = heightPx - baseHeight;
+
+    // Soft shadow ellipse on the ground at the foot
+    g.ellipse(TILE_SIZE / 2, 0, TILE_SIZE * 0.4, TILE_SIZE * 0.18)
+      .fill({ color: 0x000000, alpha: 0.3 });
+
+    // Base / trunk: a tile-wide darker rect at the bottom
+    if (baseHeight > 0) {
+      g.rect(2, -baseHeight, TILE_SIZE - 4, baseHeight)
+        .fill({ color: baseColor })
+        .stroke({ color: 0x000000, alpha: 0.4, width: 1 });
+    }
+    // Crown: lighter rect above, slightly inset on tall props for a tree-shape
+    if (crownHeight > 0) {
+      const inset = heightPx > TILE_SIZE * 1.5 ? 4 : 1;
+      g.rect(inset, -heightPx, TILE_SIZE - inset * 2, crownHeight)
+        .fill({ color: crownColor })
+        .stroke({ color: 0x000000, alpha: 0.4, width: 1 });
+    }
+    node.addChild(g);
   }
 
   _clearAll() {
-    for (const key of Object.keys(this._stage.layers)) {
-      if (key === "entities") continue;
-      this._stage.layers[key].removeChildren();
-    }
+    this._stage.layers.ground.removeChildren();
+    for (const node of this._propNodes.values()) node.destroy({ children: true });
+    this._propNodes.clear();
+    this._stage.layers.props.removeChildren();
+    this._stage.layers.debug.removeChildren();
   }
+}
+
+function lighten(hex, amount) {
+  const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  let r = (n >> 16) & 0xff;
+  let g = (n >> 8) & 0xff;
+  let b = n & 0xff;
+  r = Math.min(255, Math.round(r + (255 - r) * amount));
+  g = Math.min(255, Math.round(g + (255 - g) * amount));
+  b = Math.min(255, Math.round(b + (255 - b) * amount));
+  return (r << 16) | (g << 8) | b;
 }

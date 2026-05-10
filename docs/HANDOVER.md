@@ -1,5 +1,10 @@
 # GrindHolm — Handover für die neue Claude-Instanz
 
+> **Update 2026-05-10 — Perspektive klargestellt:** GrindHolm ist 3/4
+> axis-aligned (Stardew-Style), nicht reines Top-Down. Tile-Grid bleibt
+> rechteckig, Sprites zeigen 45°-Frontansicht, Renderer macht Y-Sort der
+> Props-Layer. Aktueller Stand siehe `CLAUDE.md` Render-Architektur.
+
 **Status:** Tag 0. Leerer Ordner. Du bist die erste Claude-Instanz, die hier arbeitet.
 
 ## Mission Brief — was ist GrindHolm

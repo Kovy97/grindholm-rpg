@@ -1,6 +1,8 @@
 # GrindHolm
 
-A 2D top-down sandbox RPG with skill grinding, settlement building, and local coop.
+A 2D sandbox RPG with skill grinding, settlement building, and local coop.
+3/4-axis-aligned perspective (Stardew-style — rectangular tile grid, sprites
+drawn from a 45° front-on angle, Y-sorted depth).
 Inspired by Stardew Valley × Medieval Dynasty × Runescape.
 
 **Status:** 1.0 in development — framework + in-game tile editor only.

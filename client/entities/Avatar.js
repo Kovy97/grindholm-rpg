@@ -106,6 +106,9 @@ export class Avatar {
     const bob = Math.sin(this._bobPhase) * BOB_AMP;
     this.container.x = Math.round(wx);
     this.container.y = Math.round(wy + bob);
+    // Y-sort key: avatar's foot position. The cloak silhouette in _drawSprite
+    // extends from -16 (head) to +12 (feet), so foot-y ≈ container.y + 12.
+    this.container.zIndex = wy + 12;
   }
 
   get worldPos() {

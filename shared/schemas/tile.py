@@ -34,4 +34,9 @@ class TileDef(BaseModel):
         pattern=r"^#[0-9a-fA-F]{6}$",
         description="Procedural fallback color when sprite is None.",
     )
+    # 3/4-perspective height. 1.0 = sprite is exactly one tile tall. Trees,
+    # walls, and similar standing props go higher (2.0 = 32x64 sprite anchored
+    # to its bottom-edge tile). Used by the Y-sort renderer to draw tall
+    # objects so they extend upward from their footprint.
+    height_tiles: float = Field(default=1.0, ge=0.5, le=8.0)
     tags: list[str] = Field(default_factory=list)

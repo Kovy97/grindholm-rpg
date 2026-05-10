@@ -14,16 +14,21 @@ export class Stage {
   constructor() {
     this.app = new Application();
     this.world = new Container();
+    // 3/4-perspective render layout:
+    //   ground     — flat tiles, no Y-sort
+    //   props      — objects + collision-layer tiles + the avatar, all
+    //                Y-sorted by foot position so taller things draw on top
+    //                of stuff in front of them
+    //   debug      — collision-debug overlay (red outlines, optional)
     this.layers = {
       ground: new Container(),
-      objects: new Container(),
-      collision: new Container(),
-      entities: new Container(),
+      props: new Container(),
+      debug: new Container(),
     };
+    this.layers.props.sortableChildren = true;
     this.world.addChild(this.layers.ground);
-    this.world.addChild(this.layers.objects);
-    this.world.addChild(this.layers.collision);
-    this.world.addChild(this.layers.entities);
+    this.world.addChild(this.layers.props);
+    this.world.addChild(this.layers.debug);
   }
 
   async init(parent) {
@@ -37,7 +42,7 @@ export class Stage {
     parent.appendChild(this.app.canvas);
     this.app.stage.addChild(this.world);
     this._showCollision = false;
-    this.layers.collision.alpha = 0;
+    this.layers.debug.alpha = 0;
     this._zoom = 1.0;
     this.world.scale.set(this._zoom);
 
@@ -48,7 +53,7 @@ export class Stage {
 
   setCollisionDebug(visible) {
     this._showCollision = visible;
-    this.layers.collision.alpha = visible ? 0.45 : 0;
+    this.layers.debug.alpha = visible ? 0.45 : 0;
   }
 
   get zoom() {

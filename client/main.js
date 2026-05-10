@@ -31,7 +31,7 @@ async function boot() {
       x: map.spawn[0],
       y: map.spawn[1],
     });
-    stage.layers.entities.addChild(avatar.container);
+    stage.layers.props.addChild(avatar.container);
 
     const tilePainter = new TilePainter({
       root: document.getElementById("dev-overlay"),

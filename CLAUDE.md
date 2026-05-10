@@ -2,7 +2,7 @@
 
 ## Mission Brief
 
-GrindHolm ist ein 2D-Top-Down-Sandbox-RPG (Stardew Valley × Medieval Dynasty × Runescape) mit offener Welt, Skill-Grind, Settlement-Building und Local-Coop. Tonalität: grounded, ruhig, kein Forced-Playstyle. Architektur ist von Tag 1 multiplayer-aware, auch wenn 1.0 single-player ist.
+GrindHolm ist ein 2D-Sandbox-RPG (Stardew Valley × Medieval Dynasty × Runescape) mit offener Welt, Skill-Grind, Settlement-Building und Local-Coop. **Perspektive: 3/4 axis-aligned (Stardew-Style)** — Tile-Grid bleibt rechteckig, Sprites zeigen 45°-Frontansicht, Y-Sort für Tiefen-Render. Tonalität: grounded, ruhig, kein Forced-Playstyle. Architektur ist von Tag 1 multiplayer-aware, auch wenn 1.0 single-player ist.
 
 ## 1.0-Scope (STRIKT, kein Feature-Creep!)
 
@@ -23,6 +23,17 @@ Was 1.0 enthalten muss:
 - Keine Sounds / keine Musik
 - Keine Multi-Save-Slots (ein Slot reicht)
 - **Kein Godot/Unity/Unreal** — alles in Code, sonst Workflow-Zwang
+
+## Render-Architektur (3/4 axis-aligned)
+
+- **Tile-Grid:** rechteckig, 32×32 Pixel pro Tile (`shared/schemas/constants.py::TILE_PIXEL_SIZE`).
+- **Drei Render-Pässe pro Frame** (`client/render/Stage.js` Layers):
+  1. `ground` — flache Bodentiles, ein Graphics-Aufruf für die ganze Map.
+  2. `props` — Objects + Collision-Tiles + Avatar, alle als individuelle Container, **Y-sortiert per `zIndex = footPx`**. So überdecken sich höhere Sprites korrekt mit Avatar.
+  3. `debug` — Collision-Outlines (rot, optional toggle).
+- **Object-Höhe:** `TileDef.height_tiles` (default 1.0). Tree=2.5, Wall=1.5. Sprite ist `TILE_SIZE × height_tiles` Pixel hoch, am Foot-Tile verankert.
+- **Sprite-Anker:** Bottom-Center jeder Prop. Y-Sort-Key = `(ty+1) * TILE_SIZE` für Tiles, `wy + 12` für Avatar (Foot-Y).
+- **Procedural-Fallback:** Footprint dunkler + Krone heller + Schatten-Ellipse — deutet 3/4-Höhe ohne echte Sprites an. Wird durch Sprite-Atlas-Calls in `_drawProp` ersetzt sobald Assets verfügbar sind.
 
 ## Tech-Stack
 
