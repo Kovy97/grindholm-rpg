@@ -256,11 +256,13 @@ export class TilePainter {
       this._hoverEl.style.display = "none";
       return;
     }
-    // hover highlight (in screen space)
-    const wx = tx * TILE_SIZE + this._stage.world.x;
-    const wy = ty * TILE_SIZE + this._stage.world.y;
-    const size = TILE_SIZE * this._brush;
-    const half = Math.floor(this._brush / 2) * TILE_SIZE;
+    // hover highlight (in screen space) — scales with camera zoom
+    const z = this._stage.zoom;
+    const tilePx = TILE_SIZE * z;
+    const wx = tx * tilePx + this._stage.world.x;
+    const wy = ty * tilePx + this._stage.world.y;
+    const size = tilePx * this._brush;
+    const half = Math.floor(this._brush / 2) * tilePx;
     this._hoverEl.style.display = "block";
     this._hoverEl.style.left = `${wx - half}px`;
     this._hoverEl.style.top = `${wy - half}px`;

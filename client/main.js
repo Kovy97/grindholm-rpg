@@ -62,6 +62,7 @@ async function boot() {
     const hudFps = document.getElementById("hud-fps");
     const hudCtx = document.getElementById("hud-context");
     const hudCoords = document.getElementById("hud-coords");
+    const hudZoom = document.getElementById("hud-zoom");
 
     let last = performance.now();
     let fpsAccum = 0;
@@ -93,6 +94,7 @@ async function boot() {
       hudFps.textContent = `${fpsShown} fps`;
       hudCtx.textContent = `ctx: ${stack.snapshot().join(" › ")}`;
       hudCoords.textContent = `tile ${Math.floor(avatar.x)} , ${Math.floor(avatar.y)}`;
+      hudZoom.textContent = `zoom ${stage.zoom.toFixed(2)}x`;
 
       requestAnimationFrame(frame);
     }
