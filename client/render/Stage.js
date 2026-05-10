@@ -1,11 +1,16 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container, TextureSource } from "pixi.js";
 
 // Mirror of shared/schemas/constants.py::TILE_PIXEL_SIZE. Don't drift.
-export const TILE_SIZE = 32;
+export const TILE_SIZE = 96;
 
 export const ZOOM_MIN = 0.5;
 export const ZOOM_MAX = 3.0;
 const ZOOM_STEP = 1.15;
+
+// Pixel-art rule of thumb: every imported texture must scale with nearest-
+// neighbour, never bilinear, or zoomed-in sprites get fuzzy edges.
+// Set defaults here so anything loaded later inherits the right mode.
+TextureSource.defaultOptions.scaleMode = "nearest";
 
 // Owns the Pixi.Application and the layered scene graph.
 // Layers (back to front): ground, objects, collision (debug), entities, ui.

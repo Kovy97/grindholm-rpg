@@ -124,13 +124,16 @@ export class TileMapRenderer {
     const def = this._defs.get(tileId);
     if (!def) return;
 
+    const widthPx = TILE_SIZE * (def.width_tiles ?? 1.0);
     const heightPx = TILE_SIZE * (def.height_tiles ?? 1.0);
     const footY = (ty + 1) * TILE_SIZE; // bottom edge of the tile
+    // bottom-center anchor: sprite of width widthPx is centered over tile tx
+    const footCenterX = (tx + 0.5) * TILE_SIZE;
     const node = new Container();
-    node.x = tx * TILE_SIZE;
+    node.x = footCenterX - widthPx / 2;
     node.y = footY;
     node.zIndex = footY; // Y-sort key
-    this._drawProp(node, def, heightPx);
+    this._drawProp(node, def, widthPx, heightPx);
     this._stage.layers.props.addChild(node);
     this._propNodes.set(key, node);
 
@@ -144,28 +147,37 @@ export class TileMapRenderer {
     }
   }
 
-  /** Procedural 3/4 prop: darker base footprint + lighter crown above. */
-  _drawProp(node, def, heightPx) {
+  /** Procedural 3/4 prop: darker base footprint + lighter crown above.
+   *  Drawn in the prop container's local coords with origin at the bottom-left
+   *  corner of the sprite bounding box (widthPx x heightPx). */
+  _drawProp(node, def, widthPx, heightPx) {
     const g = new Graphics();
     const baseColor = def.color ?? "#ff00ff";
     const crownColor = lighten(baseColor, 0.18);
+    // The trunk takes the lower 45% of the height, capped at one tile so
+    // tall sprites (trees) read as "tall thin trunk + wide canopy"
     const baseHeight = Math.min(TILE_SIZE, heightPx * 0.45);
     const crownHeight = heightPx - baseHeight;
 
-    // Soft shadow ellipse on the ground at the foot
-    g.ellipse(TILE_SIZE / 2, 0, TILE_SIZE * 0.4, TILE_SIZE * 0.18)
+    // Trunk is always one footprint-tile wide regardless of canopy width
+    const trunkWidth = TILE_SIZE * (def.width_tiles >= 1.5 ? 0.45 : 0.85);
+    const trunkX = (widthPx - trunkWidth) / 2;
+
+    // Soft shadow ellipse on the ground at the foot. Width follows the
+    // canopy so big trees cast wider shade.
+    g.ellipse(widthPx / 2, 0, widthPx * 0.4, TILE_SIZE * 0.18)
       .fill({ color: 0x000000, alpha: 0.3 });
 
-    // Base / trunk: a tile-wide darker rect at the bottom
+    // Trunk / base
     if (baseHeight > 0) {
-      g.rect(2, -baseHeight, TILE_SIZE - 4, baseHeight)
+      g.rect(trunkX, -baseHeight, trunkWidth, baseHeight)
         .fill({ color: baseColor })
         .stroke({ color: 0x000000, alpha: 0.4, width: 1 });
     }
-    // Crown: lighter rect above, slightly inset on tall props for a tree-shape
+    // Crown: lighter, full sprite-width
     if (crownHeight > 0) {
-      const inset = heightPx > TILE_SIZE * 1.5 ? 4 : 1;
-      g.rect(inset, -heightPx, TILE_SIZE - inset * 2, crownHeight)
+      const inset = heightPx > TILE_SIZE * 1.5 ? 6 : 2;
+      g.rect(inset, -heightPx, widthPx - inset * 2, crownHeight)
         .fill({ color: crownColor })
         .stroke({ color: 0x000000, alpha: 0.4, width: 1 });
     }

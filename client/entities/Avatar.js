@@ -9,7 +9,17 @@ import { TILE_SIZE } from "../render/Stage.js";
 // Talks ONLY to ActionBus (`isHeld`). Never reads keys directly.
 const SPEED = 4.5; // tiles per second
 const BOB_SPEED = 8.0;
-const BOB_AMP = 1.5;
+
+// The procedural cloak silhouette below was hand-coded against a 32-px
+// reference tile. We scale the whole container by TILE_SIZE/32 so the
+// avatar stays the same proportional size when TILE_SIZE changes. Replace
+// with a real sprite (~64x96 or 64x128) and remove the scale hack.
+const SPRITE_REF_SIZE = 32;
+const SPRITE_SCALE = TILE_SIZE / SPRITE_REF_SIZE;
+const BOB_AMP = 1.5 * SPRITE_SCALE;
+// In sprite-local coords the foot is at +12 (see _drawSprite). Multiplied
+// by SPRITE_SCALE to get the world-space foot-offset for Y-sorting.
+const FOOT_OFFSET_WORLD = 12 * SPRITE_SCALE;
 
 export class Avatar {
   constructor({ bus, tileMap, x, y }) {
@@ -22,6 +32,7 @@ export class Avatar {
     this._lastFacing = "down";
 
     this.container = new Container();
+    this.container.scale.set(SPRITE_SCALE);
     this._gfx = new Graphics();
     this._drawSprite();
     this.container.addChild(this._gfx);
@@ -106,9 +117,8 @@ export class Avatar {
     const bob = Math.sin(this._bobPhase) * BOB_AMP;
     this.container.x = Math.round(wx);
     this.container.y = Math.round(wy + bob);
-    // Y-sort key: avatar's foot position. The cloak silhouette in _drawSprite
-    // extends from -16 (head) to +12 (feet), so foot-y ≈ container.y + 12.
-    this.container.zIndex = wy + 12;
+    // Y-sort key: avatar's foot in world space.
+    this.container.zIndex = wy + FOOT_OFFSET_WORLD;
   }
 
   get worldPos() {

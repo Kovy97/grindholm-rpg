@@ -34,9 +34,13 @@ class TileDef(BaseModel):
         pattern=r"^#[0-9a-fA-F]{6}$",
         description="Procedural fallback color when sprite is None.",
     )
-    # 3/4-perspective height. 1.0 = sprite is exactly one tile tall. Trees,
-    # walls, and similar standing props go higher (2.0 = 32x64 sprite anchored
-    # to its bottom-edge tile). Used by the Y-sort renderer to draw tall
-    # objects so they extend upward from their footprint.
+    # 3/4-perspective sprite footprint in tile units. The renderer anchors the
+    # sprite at the bottom-center of (tx, ty) and draws upward by height_tiles
+    # and outward by width_tiles/2 on each side.
+    #   width_tiles  = 1.0 -> sprite is exactly one tile wide (no overhang)
+    #   height_tiles = 2.5 -> sprite reaches 2.5 tiles up from its foot tile
+    # Tall objects (trees, walls) extend their canopy beyond their walkable
+    # footprint without affecting collision, which is decided per-tile.
+    width_tiles: float = Field(default=1.0, ge=0.5, le=8.0)
     height_tiles: float = Field(default=1.0, ge=0.5, le=8.0)
     tags: list[str] = Field(default_factory=list)

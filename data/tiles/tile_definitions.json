@@ -45,6 +45,7 @@
     "layer": "objects",
     "walkable": false,
     "color": "#4a2f1a",
+    "width_tiles": 1.5,
     "height_tiles": 2.5,
     "tags": ["natural", "tree"]
   },
@@ -54,6 +55,7 @@
     "layer": "objects",
     "walkable": false,
     "color": "#1f4d18",
+    "width_tiles": 1.0,
     "height_tiles": 1.0,
     "tags": ["natural", "shrub"]
   },
@@ -63,6 +65,7 @@
     "layer": "collision",
     "walkable": false,
     "color": "#5a5550",
+    "width_tiles": 1.0,
     "height_tiles": 1.5,
     "tags": ["constructed", "wall"]
   }
