@@ -1,3 +1,4 @@
+import { Assets } from "pixi.js";
 import { initInput, Context } from "./input/index.js";
 import { Stage, TILE_SIZE } from "./render/Stage.js";
 import { TileMapRenderer } from "./render/TileMapRenderer.js";
@@ -15,6 +16,18 @@ async function boot() {
     if (!mapList.length) throw new Error("no maps in data/maps/");
     const mapId = mapList[0].id;
     const map = await api.getMap(mapId);
+
+    // Preload every sprite referenced by a TileDef. Backend serves the
+    // assets/ folder under /sprites, so def.sprite="tiles/grass.png" maps
+    // to /sprites/tiles/grass.png.
+    const spriteUrls = tiles
+      .map((t) => t.sprite)
+      .filter(Boolean)
+      .map((p) => `/sprites/${p}`);
+    if (spriteUrls.length) {
+      await Assets.load(spriteUrls);
+      console.log(`[grindholm] preloaded ${spriteUrls.length} tile sprites`);
+    }
 
     const { bus, stack, mapper } = await initInput("/api");
 

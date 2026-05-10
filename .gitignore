@@ -30,6 +30,10 @@ data/settings/keybindings.local.json
 .env
 .env.local
 
+# Asset pipeline temp / debug
+assets/_tile_tests/
+assets/_*/
+
 # Build artifacts
 build/
 *.spec

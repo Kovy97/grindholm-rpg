@@ -5,7 +5,35 @@
     "layer": "ground",
     "walkable": true,
     "color": "#3a7d2c",
+    "sprite": "tiles/grass_basic.png",
     "tags": ["natural", "ground"]
+  },
+  {
+    "id": "grass_patchy",
+    "name": "Patchy Grass",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#3d6b1f",
+    "sprite": "tiles/grass_patchy.png",
+    "tags": ["natural", "ground"]
+  },
+  {
+    "id": "grass_tall",
+    "name": "Tall Grass",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#2f6d22",
+    "sprite": "tiles/grass_tall.png",
+    "tags": ["natural", "ground"]
+  },
+  {
+    "id": "grass_snowy",
+    "name": "Snowy Grass",
+    "layer": "ground",
+    "walkable": true,
+    "color": "#cdd6cf",
+    "sprite": "tiles/grass_snowy.png",
+    "tags": ["natural", "ground", "winter"]
   },
   {
     "id": "grass_dark",
