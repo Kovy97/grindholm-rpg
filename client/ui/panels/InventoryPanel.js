@@ -20,11 +20,11 @@ export class InventoryPanel {
     this._root.innerHTML = `
       <div class="inv-panel">
         <div class="inv-panel-title">Inventory</div>
-        <div class="inv-grid" id="inv-grid"></div>
-        <div class="inv-gold"><span id="inv-gold">0</span> gp</div>
+        <div class="inv-grid"></div>
+        <div class="inv-gold"><span class="inv-gold-num">0</span> gp</div>
       </div>
     `;
-    const grid = this._root.querySelector("#inv-grid");
+    const grid = this._root.querySelector(".inv-grid");
     for (let i = 0; i < COLS * ROWS; i++) {
       const cell = document.createElement("div");
       cell.className = "inv-slot";
@@ -55,7 +55,7 @@ export class InventoryPanel {
     const inv = this._game.state?.player?.inventory;
     if (!inv) return;
     const items = this._game.itemsById;
-    const grid = this._root.querySelector("#inv-grid");
+    const grid = this._root.querySelector(".inv-grid");
     if (!grid) return;
     const cells = grid.children;
     for (let i = 0; i < COLS * ROWS; i++) {
@@ -78,8 +78,8 @@ export class InventoryPanel {
         cell.appendChild(count);
       }
     }
-    const goldEl = this._root.querySelector("#inv-gold");
-    if (goldEl) goldEl.textContent = inv.gold ?? 0;
+    const goldEl = this._root.querySelector(".inv-gold-num");
+    if (goldEl) goldEl.textContent = (inv.gold ?? 0).toLocaleString();
   }
 
   _onSlotClick(idx, e) {

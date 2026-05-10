@@ -192,20 +192,25 @@ def recruit_npc(
     archetype_id: str,
     spawn_x: float,
     spawn_y: float,
+    bypass_cost: bool = False,
 ) -> Optional[NPC]:
-    """Recruit a new NPC of a given archetype.
+    """Spawn / recruit an NPC of a given archetype.
 
     Costs gold per archetype.base_recruitment_cost. Skills are rolled
     randomly within each starting_skills (min, max) range.
+
+    Set bypass_cost=True for the dev-tool spawn path so testing doesn't
+    drain gold and traders are free to materialise without funds.
     """
     archs = loaders.npc_archetype_defs_by_id()
     arch = archs.get(archetype_id)
     if arch is None:
         return None
     with state.lock:
-        if state.world.player.inventory.gold < arch.base_recruitment_cost:
+        if not bypass_cost and state.world.player.inventory.gold < arch.base_recruitment_cost:
             return None
-        state.world.player.inventory.gold -= arch.base_recruitment_cost
+        if not bypass_cost:
+            state.world.player.inventory.gold -= arch.base_recruitment_cost
         from shared.schemas import NPC as NPCModel
         from shared.schemas import SkillBook
         from shared.schemas.skill import xp_for_level
@@ -218,10 +223,69 @@ def recruit_npc(
             id=state.new_id("npc"),
             name=random.choice(arch.name_pool),
             archetype=arch.archetype,
+            archetype_id=arch.id,
             color=arch.color,
             skills=skills,
             tile_x=spawn_x,
             tile_y=spawn_y,
+            is_trader=arch.is_trader,
         )
         state.world.npcs[npc.id] = npc
         return npc
+
+
+def trader_offers(state: GameState, npc_id: str) -> list[dict]:
+    """Return the merchant's stock as a JSON-friendly list."""
+    archs = loaders.npc_archetype_defs_by_id()
+    items_db = loaders.items_by_id()
+    with state.lock:
+        npc = state.world.npcs.get(npc_id)
+        if npc is None or not npc.is_trader:
+            return []
+        arch = archs.get(npc.archetype_id or "")
+        if arch is None:
+            return []
+        out = []
+        for offer in arch.trade_offers:
+            item = items_db.get(offer.item_id)
+            if item is None:
+                continue
+            out.append({
+                "item_id": offer.item_id,
+                "name": item.name,
+                "color": item.color,
+                "description": item.description,
+                "price": offer.price,
+                "stock": offer.stock,
+            })
+        return out
+
+
+def trader_buy(state: GameState, npc_id: str, item_id: str, count: int = 1) -> dict:
+    """Buy `count` of `item_id` from the trader. Returns {ok, message}."""
+    archs = loaders.npc_archetype_defs_by_id()
+    items_db = loaders.items_by_id()
+    from server.game.inventory_ops import add_item
+    with state.lock:
+        npc = state.world.npcs.get(npc_id)
+        if npc is None or not npc.is_trader:
+            return {"ok": False, "message": "no such trader"}
+        arch = archs.get(npc.archetype_id or "")
+        if arch is None:
+            return {"ok": False, "message": "trader has no offers"}
+        offer = next((o for o in arch.trade_offers if o.item_id == item_id), None)
+        if offer is None:
+            return {"ok": False, "message": "item not offered"}
+        item = items_db.get(item_id)
+        if item is None:
+            return {"ok": False, "message": "unknown item"}
+        cost = offer.price * count
+        if state.world.player.inventory.gold < cost:
+            return {"ok": False, "message": "not enough gp"}
+        state.world.player.inventory.gold -= cost
+        added = add_item(state.world.player.inventory, item, count)
+        if added <= 0:
+            # refund
+            state.world.player.inventory.gold += cost
+            return {"ok": False, "message": "inventory full"}
+        return {"ok": True, "message": f"bought {added} × {item.name} for {cost} gp"}

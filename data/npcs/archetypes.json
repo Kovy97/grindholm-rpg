@@ -52,5 +52,32 @@
       "building": [5, 15]
     },
     "base_recruitment_cost": 100
+  },
+  {
+    "id": "travelling_merchant",
+    "name_pool": ["Theo Pence", "Marka the Merchant", "Saffron Coin"],
+    "archetype": "trader",
+    "color": "#c89030",
+    "starting_skills": {},
+    "base_recruitment_cost": 0,
+    "is_trader": true,
+    "trade_offers": [
+      {"item_id": "axe_bronze", "price": 0, "stock": 99},
+      {"item_id": "axe_steel", "price": 0, "stock": 99},
+      {"item_id": "fishing_net", "price": 0, "stock": 99},
+      {"item_id": "fishing_rod", "price": 0, "stock": 99},
+      {"item_id": "fishing_cage", "price": 0, "stock": 99},
+      {"item_id": "tinderbox", "price": 0, "stock": 99},
+      {"item_id": "hoe", "price": 0, "stock": 99},
+      {"item_id": "hammer", "price": 0, "stock": 99},
+      {"item_id": "seed_potato", "price": 0, "stock": 99},
+      {"item_id": "log_normal", "price": 0, "stock": 99},
+      {"item_id": "log_oak", "price": 0, "stock": 99},
+      {"item_id": "plank_normal", "price": 0, "stock": 99},
+      {"item_id": "shrimp_raw", "price": 0, "stock": 99},
+      {"item_id": "trout_raw", "price": 0, "stock": 99},
+      {"item_id": "lobster_raw", "price": 0, "stock": 99},
+      {"item_id": "potato_raw", "price": 0, "stock": 99}
+    ]
   }
 ]

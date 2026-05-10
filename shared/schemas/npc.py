@@ -48,6 +48,16 @@ class BehaviourNode(str, Enum):
     SEEKING_BED = "seeking_bed"
 
 
+class TradeOffer(BaseModel):
+    """A single line in a trader's stock: item + price (in gp)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    item_id: str
+    price: int = Field(default=0, ge=0)
+    stock: int = Field(default=999, ge=0, description="Reset on each session for now")
+
+
 class NpcArchetypeDef(BaseModel):
     """Static template — used at recruitment to spawn an NPC instance."""
 
@@ -63,6 +73,8 @@ class NpcArchetypeDef(BaseModel):
         description="Per skill: (min_level, max_level) rolled at recruitment",
     )
     base_recruitment_cost: int = 100  # gold
+    is_trader: bool = False
+    trade_offers: list[TradeOffer] = Field(default_factory=list)
 
 
 class NPC(BaseModel):
@@ -73,6 +85,7 @@ class NPC(BaseModel):
     id: str
     name: str
     archetype: NpcArchetype
+    archetype_id: Optional[str] = None  # back-link to NpcArchetypeDef.id (for trader lookups)
     sprite: Optional[str] = None
     color: Optional[str] = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     skills: SkillBook = Field(default_factory=SkillBook.fresh)
@@ -84,3 +97,4 @@ class NPC(BaseModel):
     tile_x: float = 0.0
     tile_y: float = 0.0
     network_owner: str = "local"
+    is_trader: bool = False

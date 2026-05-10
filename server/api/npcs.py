@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from server.game.npc_ai import recruit_npc
+from server.game.npc_ai import recruit_npc, trader_buy, trader_offers
 from server.game.state import state
 from shared.schemas import NpcJob, SkillKind
 
@@ -47,3 +47,34 @@ def assign_job(req: AssignJobRequest) -> dict:
             zone_max_y=req.zone_max_y,
         )
     return {"ok": True}
+
+
+# --- Dev-tool: free spawn (no gold cost) ---
+class DevSpawnRequest(BaseModel):
+    archetype_id: str
+    spawn_x: float
+    spawn_y: float
+
+
+@router.post("/dev_spawn")
+def dev_spawn(req: DevSpawnRequest) -> dict:
+    npc = recruit_npc(state, req.archetype_id, req.spawn_x, req.spawn_y, bypass_cost=True)
+    if npc is None:
+        raise HTTPException(400, "unknown archetype")
+    return {"ok": True, "npc": npc.model_dump(mode="json")}
+
+
+# --- Trade ---
+@router.get("/{npc_id}/trade_offers")
+def get_trade_offers(npc_id: str) -> list[dict]:
+    return trader_offers(state, npc_id)
+
+
+class TradeBuyRequest(BaseModel):
+    item_id: str
+    count: int = 1
+
+
+@router.post("/{npc_id}/trade_buy")
+def trade_buy(npc_id: str, req: TradeBuyRequest) -> dict:
+    return trader_buy(state, npc_id, req.item_id, req.count)

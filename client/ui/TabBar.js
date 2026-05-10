@@ -1,16 +1,19 @@
 // Bottom-right OSRS tab bar — switches between panels.
+// Each panel has its own container DOM element; the tab bar toggles which
+// container is visible. Calling activate(null) closes everything.
 
 const TABS = [
-  { id: "inventory", label: "Inv", icon: "🎒" },
-  { id: "equipment", label: "Eq",  icon: "🛡" },
-  { id: "skills",    label: "Skl", icon: "⚔" },
-  { id: "build",     label: "Bld", icon: "🔨" },
+  { id: "inventory", label: "Inventory", icon: "🎒" },
+  { id: "equipment", label: "Equipment", icon: "🛡" },
+  { id: "skills",    label: "Skills",    icon: "⚔" },
+  { id: "build",     label: "Build",     icon: "🔨" },
 ];
 
 export class TabBar {
-  constructor({ root, panels, onSwitch }) {
+  constructor({ root, panelHost, panels, onSwitch }) {
     this._root = root;
-    this._panels = panels; // { id -> {show, hide} }
+    this._panelHost = panelHost; // outer container (#hud-panel-host)
+    this._panels = panels;       // { id -> Panel instance with .show()/.hide() }
     this._onSwitch = onSwitch || (() => {});
     this._active = null;
     this._build();
@@ -32,17 +35,33 @@ export class TabBar {
 
   activate(id) {
     if (this._active === id) {
-      // toggle off
-      this._panels[id]?.hide();
+      // toggle off — close all
+      this._closeAll();
       this._active = null;
     } else {
-      if (this._active && this._panels[this._active]) this._panels[this._active].hide();
-      this._panels[id]?.show();
+      this._closeAll();
+      const p = this._panels[id];
+      if (p) p.show();
+      // show outer host + activate the right slot
+      this._panelHost.classList.remove("hidden");
+      for (const slot of this._panelHost.querySelectorAll(".hud-panel-slot")) {
+        slot.classList.toggle("active", slot.dataset.panel === id);
+      }
       this._active = id;
     }
     for (const btn of this._root.querySelectorAll(".tabbar-btn")) {
       btn.classList.toggle("active", btn.dataset.tab === this._active);
     }
     this._onSwitch(this._active);
+  }
+
+  _closeAll() {
+    for (const id in this._panels) {
+      this._panels[id]?.hide?.();
+    }
+    this._panelHost.classList.add("hidden");
+    for (const slot of this._panelHost.querySelectorAll(".hud-panel-slot")) {
+      slot.classList.remove("active");
+    }
   }
 }

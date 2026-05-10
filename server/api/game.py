@@ -19,7 +19,7 @@ from server.game.inventory_ops import (
     swap_slots,
     unequip,
 )
-from server.game.pathfinding import a_star
+from server.game.pathfinding import find_path
 from server.game.state import state
 from server.game.world import grant_starter_inventory, make_walkable_fn, populate_initial_world
 from shared.schemas import EquipSlot
@@ -75,12 +75,16 @@ class WalkRequest(BaseModel):
 
 @router.post("/walk")
 def walk(req: WalkRequest) -> dict:
-    """Compute a path from player to target tile."""
+    """Compute a continuous-coordinate path from player to target tile.
+
+    Output is a list of (x, y) floats in tile-space — the client just
+    interpolates linearly between consecutive points. Diagonal moves
+    and string-pulled long segments make the motion feel non-grid."""
     walkable = make_walkable_fn(state, state.world.map_id)
     with state.lock:
-        sx, sy = int(state.world.player.tile_x), int(state.world.player.tile_y)
-    path = a_star((sx, sy), (req.target_x, req.target_y), walkable)
-    return {"path": [list(p) for p in path]}
+        sx, sy = state.world.player.tile_x, state.world.player.tile_y
+    path = find_path((sx, sy), (req.target_x, req.target_y), walkable)
+    return {"path": [[round(x, 4), round(y, 4)] for (x, y) in path]}
 
 
 class TeleportRequest(BaseModel):

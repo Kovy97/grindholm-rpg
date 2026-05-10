@@ -34,6 +34,7 @@ from .npc import (
     NpcJob,
     NeedsState,
     BehaviourNode,
+    TradeOffer,
 )
 from .building import BuildingCategory, BuildingDef, BuildingInstance
 
@@ -85,6 +86,7 @@ __all__ = [
     "NpcJob",
     "NeedsState",
     "BehaviourNode",
+    "TradeOffer",
     # buildings
     "BuildingCategory",
     "BuildingDef",

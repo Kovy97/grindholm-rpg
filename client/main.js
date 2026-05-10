@@ -131,23 +131,23 @@ async function boot() {
       },
     });
 
-    // tab bar — only one panel visible at a time
+    // tab bar — each panel owns its own slot; tabbar toggles which slot is visible
     const tabBar = new TabBar({
       root: document.getElementById("tab-host"),
+      panelHost,
       panels: {
-        inventory: { show: () => switchPanel(inventoryPanel), hide: () => panelHost.classList.add("hidden") },
-        equipment: { show: () => switchPanel(equipmentPanel), hide: () => panelHost.classList.add("hidden") },
-        skills:    { show: () => switchPanel(skillsPanel),    hide: () => panelHost.classList.add("hidden") },
-        build:     { show: () => switchPanel(buildPanel),     hide: () => { panelHost.classList.add("hidden"); buildSelection = null; document.getElementById("build-cursor").style.display = "none"; } },
+        inventory: inventoryPanel,
+        equipment: equipmentPanel,
+        skills:    skillsPanel,
+        build:     buildPanel,
+      },
+      onSwitch: (id) => {
+        if (id !== "build" && buildSelection) {
+          buildSelection = null;
+          document.getElementById("build-cursor").style.display = "none";
+        }
       },
     });
-    function switchPanel(panel) {
-      panelHost.classList.remove("hidden");
-      panelHost.innerHTML = "";
-      panel.show();
-    }
-
-    // start with inventory open
     tabBar.activate("inventory");
 
     // minimap
@@ -203,9 +203,30 @@ async function boot() {
         }
         return;
       }
+      // NPC?
+      const npcHere = npcAt(tx, ty);
+      if (npcHere) {
+        if (npcHere.is_trader) {
+          walker.walkTo(tx, ty, () => tradeModal.open(npcHere));
+          return;
+        }
+        gc.toast(`${npcHere.name}: "Greetings."`, "");
+        walker.walkTo(tx, ty);
+        return;
+      }
       // empty tile -> walk
       walker.walkTo(tx, ty);
     });
+
+    function npcAt(tx, ty) {
+      if (!gc.state?.npcs) return null;
+      for (const id in gc.state.npcs) {
+        const n = gc.state.npcs[id];
+        if (Math.floor(n.tile_x) === tx && Math.floor(n.tile_y) === ty) return n;
+        if (Math.abs(n.tile_x - (tx + 0.5)) < 0.7 && Math.abs(n.tile_y - (ty + 0.5)) < 0.7) return n;
+      }
+      return null;
+    }
 
     canvas.addEventListener("contextmenu", (e) => {
       e.preventDefault();
@@ -232,6 +253,23 @@ async function boot() {
           if (cookables.length) actions.push({ label: "Cook", run: () => showContextMenu(cookables, e.clientX, e.clientY) });
         }
         actions.push({ label: `Examine ${def?.name}`, run: () => gc.toast(def?.name || "Building", "") });
+      }
+      const npcInst = npcAt(tx, ty);
+      if (npcInst) {
+        if (npcInst.is_trader) {
+          actions.push({
+            label: `Trade with ${npcInst.name}`,
+            run: () => walker.walkTo(tx, ty, () => tradeModal.open(npcInst)),
+          });
+        }
+        actions.push({
+          label: `Talk to ${npcInst.name}`,
+          run: () => gc.toast(`${npcInst.name}: "Hello, traveller."`, ""),
+        });
+        actions.push({
+          label: `Examine ${npcInst.name}`,
+          run: () => gc.toast(`${npcInst.name} (${npcInst.archetype})`, ""),
+        });
       }
       actions.push({ label: "Walk Here", run: () => walker.walkTo(tx, ty) });
       showContextMenu(actions, e.clientX, e.clientY);

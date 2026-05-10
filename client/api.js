@@ -82,6 +82,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ archetype_id, spawn_x, spawn_y }),
     }),
+  devSpawnNpc: (archetype_id, spawn_x, spawn_y) =>
+    request("/npcs/dev_spawn", {
+      method: "POST",
+      body: JSON.stringify({ archetype_id, spawn_x, spawn_y }),
+    }),
+  getTradeOffers: (npc_id) => request(`/npcs/${npc_id}/trade_offers`),
+  tradeBuy: (npc_id, item_id, count = 1) =>
+    request(`/npcs/${npc_id}/trade_buy`, {
+      method: "POST",
+      body: JSON.stringify({ item_id, count }),
+    }),
   assignJob: (npc_id, skill, zone) =>
     request("/npcs/assign_job", {
       method: "POST",

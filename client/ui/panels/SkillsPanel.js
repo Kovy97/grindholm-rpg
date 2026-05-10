@@ -39,8 +39,8 @@ export class SkillsPanel {
     this._root.innerHTML = `
       <div class="sk-panel">
         <div class="sk-panel-title">Skills</div>
-        <div class="sk-grid" id="sk-grid"></div>
-        <div class="sk-total">Total <span id="sk-total">6</span></div>
+        <div class="sk-grid"></div>
+        <div class="sk-total">Total <span class="sk-total-num">6</span></div>
       </div>
     `;
   }
@@ -56,7 +56,7 @@ export class SkillsPanel {
   render() {
     const skills = this._game.state?.player?.skills?.skills;
     if (!skills) return;
-    const grid = this._root.querySelector("#sk-grid");
+    const grid = this._root.querySelector(".sk-grid");
     if (!grid) return;
     grid.innerHTML = "";
     let total = 0;
@@ -78,7 +78,7 @@ export class SkillsPanel {
       `;
       grid.appendChild(cell);
     }
-    const totalEl = this._root.querySelector("#sk-total");
+    const totalEl = this._root.querySelector(".sk-total-num");
     if (totalEl) totalEl.textContent = total;
   }
 }

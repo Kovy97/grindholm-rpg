@@ -14,7 +14,7 @@ export class BuildPanel {
       <div class="bld-panel">
         <div class="bld-panel-title">Build</div>
         <div class="bld-help">Pick a structure, then click a tile to place it.</div>
-        <div class="bld-list" id="bld-list"></div>
+        <div class="bld-list"></div>
       </div>
     `;
     this.render();
@@ -31,7 +31,7 @@ export class BuildPanel {
 
   render() {
     const defs = this._game.buildingDefs;
-    const list = this._root.querySelector("#bld-list");
+    const list = this._root.querySelector(".bld-list");
     if (!list || !defs) return;
     list.innerHTML = "";
     for (const def of defs) {
